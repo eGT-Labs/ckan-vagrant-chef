@@ -10,6 +10,9 @@ CKAN_DIR = "#{SOURCE_DIR}/ckan"
 ESCAPED_SITE_URL = node[:ckan][:site_url].gsub('/','\\/')
 ESCAPED_SOLR_URL = node[:ckan][:solr_url].gsub('/','\\/')
 ESCAPED_STORAGE_PATH = node[:ckan][:file_storage_dir].gsub('/','\\/')
+# Install some packages
+package ['python-pip','libpq-dev','python-dev']
+execute 'pip install virtualenv'
 
 # Create user
 user node[:ckan][:user] do

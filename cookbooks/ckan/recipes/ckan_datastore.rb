@@ -22,14 +22,22 @@ end
 postgresql_connection_info = {
   :host     => '127.0.0.1',
   :port     => 5432,
-  :username => node[:ckan][:sql_user],
-  :password => node[:ckan][:sql_password]
+#  :username => node[:ckan][:sql_user],
+  :password => node[:postgresql][:password][:postgres]
 }
 
-# create a postgresql database with additional parameters
-postgresql_database node[:ckan][:sql_db_name] do
+# Create a less privileged datastore user
+postgresql_database_user  node[:ckan][:datastore][:sql_user] do
+  connection postgresql_connection_info
+  password node[:ckan][:sql_password]
+  action :create
+end
+
+# create a postgresql database for the datastore with additional parameters
+postgresql_database node[:ckan][:datastore][:sql_db_name] do
   connection postgresql_connection_info
   owner node[:ckan][:sql_user]
+  encoding "utf8"
   action :create
 end
 
