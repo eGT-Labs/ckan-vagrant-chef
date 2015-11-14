@@ -21,13 +21,13 @@ servers:
         proto: udp
       - 
         hosts: 
-          - 0.0.0.0/32
+          - 0.0.0.0/0
         port: 80
         proto: tcp
     name: ckanserver
     run_list: 
       - "recipe[ckan::ckan_production]"
-    size: t2.micro
+    size: t2.medium
     skipinitialupdates: true
     src-dst-check: true
     ssh_user: ubuntu

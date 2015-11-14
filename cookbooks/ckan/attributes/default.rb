@@ -27,3 +27,4 @@ default[:repository][:commit] = "release-v2.3"
 # Apache config for production
 default[:apache][:server_name] = "data-gov-ua.org"
 default[:apache][:server_alias] = "www.data-gov-ua.org"
+default[:apache][:file_owner] = "www-data"

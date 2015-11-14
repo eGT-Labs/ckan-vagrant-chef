@@ -1,10 +1,24 @@
+include_recipe "git"
+include_recipe "python"
+include_recipe "database::postgresql"
+include_recipe "postgresql::server"
+include_recipe "postgresql::client"
+include_recipe "java"
 include_recipe "ckan::ckan_base"
-include_recipe "ckan::ckan_datastore"
 
-# Create a production.ini file.
+# Create a production.ini file.  Use a template so this doesn't blow up in compile phase and we can configure it
+=begin
 file "#{node[:ckan][:config_dir]}/production.ini" do
   content IO.read("#{node[:ckan][:config_dir]}/development.ini")
   action :create
+end
+=end
+
+template  "#{node[:ckan][:config_dir]}/production.ini" do
+  source "ckan_production_ini.erb"
+  owner "ckan"
+  group "ckan"
+  mode "0644"
 end
 
 # Install and configure apache
@@ -48,6 +62,17 @@ end
 package "nginx" do
     action :install
 end
+
+# Grant permissions on the storage directory to the web server(s)
+%w[ node[:ckan][:file_storage_dir] "#{ node[:ckan][:file_storage_dir]}/storage" ].each do |path|
+  directory path do
+    owner node[:apache][:file_owner]
+    group node[:apache][:file_owner]
+    mode '0755'
+    recursive true
+  end
+end
+
 # enable site, and disable default
 template "/etc/nginx/sites-available/ckan_#{node[:ckan][:project_name]}" do
     source "nginx_site_tmpl.erb"
@@ -78,3 +103,5 @@ service "nginx" do
   supports :restart => true, :reload => true
   action [:enable, :restart]
 end
+include_recipe "ckan::ckan_datastore"
+include_recipe "ckan::ckan_datapusher"

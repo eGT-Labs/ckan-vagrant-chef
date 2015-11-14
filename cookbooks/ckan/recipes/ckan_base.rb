@@ -214,6 +214,16 @@ directory node[:ckan][:file_storage_dir] do
   recursive true
   action :create
 end
+
+# Create storage subdir.  Ownership will change if we run production to allow apache, etc.
+directory "#{node[:ckan][:file_storage_dir]}/storage" do
+  owner node[:ckan][:user]
+  group node[:ckan][:user]
+  recursive true
+  action :create
+end
+
+
 # Set storage path in config file
 execute "set storage path in config file" do
   user node[:ckan][:user]
